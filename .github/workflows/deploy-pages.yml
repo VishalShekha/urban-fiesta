@@ -34,7 +34,7 @@ jobs:
 
       - name: Generate config.js from secrets
         run: |
-          cat > frontend/config.js <<EOF
+          cat > config.js <<EOF
           window.APP_CONFIG = {
             WORKER_URL: "${{ secrets.WORKER_URL }}",
             API_KEY: "${{ secrets.API_KEY }}",
@@ -44,7 +44,7 @@ jobs:
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: frontend
+          path: .
 
   deploy:
     needs: build
