@@ -15,5 +15,5 @@
 
 window.APP_CONFIG = {
   WORKER_URL: "https://activity-tracker-api.YOUR_SUBDOMAIN.workers.dev",
-  API_KEY: "REPLACE_WITH_THE_SAME_VALUE_YOU_SET_AS_THE_API_KEY_SECRET",
+  API_KEY: "",
 };
