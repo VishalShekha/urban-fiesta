@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Activity Tracker</title>
+<link rel="stylesheet" href="style.css" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+</head>
+<body>
+
+  <div class="app">
+    <header class="app-header">
+      <h1>Activity Tracker</h1>
+      <button id="new-activity-btn" class="btn btn-accent" type="button">New activity</button>
+    </header>
+
+    <p id="sync-status" class="sync-status">Loading…</p>
+
+    <section id="new-activity-panel" class="panel panel-hidden" aria-hidden="true">
+      <form id="new-activity-form" class="new-activity-form">
+        <div class="field field-name">
+          <label for="activity-name">Name</label>
+          <input id="activity-name" name="name" type="text" maxlength="100" placeholder="e.g. Laundry" required />
+        </div>
+        <div class="field field-duration">
+          <label>Duration</label>
+          <div class="duration-inputs">
+            <input id="duration-hours" type="number" min="0" max="99" value="0" aria-label="Hours" />
+            <span>h</span>
+            <input id="duration-minutes" type="number" min="0" max="59" value="30" aria-label="Minutes" />
+            <span>m</span>
+            <input id="duration-seconds" type="number" min="0" max="59" value="0" aria-label="Seconds" />
+            <span>s</span>
+          </div>
+        </div>
+        <div class="field field-actions">
+          <button type="submit" class="btn btn-accent">Add</button>
+          <button type="button" id="cancel-new-activity" class="btn btn-ghost">Cancel</button>
+        </div>
+      </form>
+    </section>
+
+    <main id="activity-list" class="activity-list" aria-live="polite">
+      <!-- activity cards injected here -->
+    </main>
+
+    <p id="empty-state" class="empty-state panel-hidden">
+      No activities yet. Add one to start tracking.
+    </p>
+  </div>
+
+  <template id="activity-card-template">
+    <article class="card" data-id="">
+      <div class="card-accent"></div>
+      <div class="card-body">
+        <div class="card-top">
+          <h2 class="card-name"></h2>
+          <div class="card-controls">
+            <button class="icon-btn reset-btn" type="button" title="Reset timer" aria-label="Reset timer">⟲</button>
+            <button class="icon-btn delete-btn" type="button" title="Delete activity" aria-label="Delete activity">✕</button>
+          </div>
+        </div>
+        <p class="card-time"></p>
+        <div class="progress-track">
+          <div class="progress-fill"></div>
+        </div>
+      </div>
+    </article>
+  </template>
+
+  <!-- config.js defines window.APP_CONFIG = { WORKER_URL, API_KEY } -->
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
