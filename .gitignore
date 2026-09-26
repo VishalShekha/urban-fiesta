@@ -1,4 +1,6 @@
 # Contains your real Worker URL + API key. See config.example.js.
-# If you want GitHub Pages to serve it, either remove this line and commit
-# config.js deliberately, or make the repo private first.
+# The GitHub Actions workflow (.github/workflows/deploy-pages.yml) generates
+# this file at deploy time from repository Secrets, so it never needs to be
+# committed. This line is just a safety net in case you create one locally
+# for testing.
 config.js
