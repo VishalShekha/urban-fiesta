@@ -1,58 +1,58 @@
-name: Deploy to GitHub Pages
+# name: Deploy to GitHub Pages
 
-# Builds frontend/config.js from repository secrets (so the real API key
-# never lives in the git history) and publishes frontend/ to GitHub Pages.
-#
-# Requires two repository secrets (Settings > Secrets and variables >
-# Actions > New repository secret):
-#   WORKER_URL  - your deployed Cloudflare Worker's URL
-#   API_KEY     - must match the API_KEY secret set with
-#                 `wrangler secret put API_KEY` in worker/
-#
-# Also requires Settings > Pages > Build and deployment > Source
-# to be set to "GitHub Actions" (not "Deploy from a branch").
+# # Builds frontend/config.js from repository secrets (so the real API key
+# # never lives in the git history) and publishes frontend/ to GitHub Pages.
+# #
+# # Requires two repository secrets (Settings > Secrets and variables >
+# # Actions > New repository secret):
+# #   WORKER_URL  - your deployed Cloudflare Worker's URL
+# #   API_KEY     - must match the API_KEY secret set with
+# #                 `wrangler secret put API_KEY` in worker/
+# #
+# # Also requires Settings > Pages > Build and deployment > Source
+# # to be set to "GitHub Actions" (not "Deploy from a branch").
 
-on:
-  push:
-    branches: [main]
-  workflow_dispatch:
+# on:
+#   push:
+#     branches: [main]
+#   workflow_dispatch:
 
-permissions:
-  contents: read
-  pages: write
-  id-token: write
+# permissions:
+#   contents: read
+#   pages: write
+#   id-token: write
 
-concurrency:
-  group: pages
-  cancel-in-progress: true
+# concurrency:
+#   group: pages
+#   cancel-in-progress: true
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v4
 
-      - name: Generate config.js from secrets
-        run: |
-          cat > config.js <<EOF
-          window.APP_CONFIG = {
-            WORKER_URL: "${{ secrets.WORKER_URL }}",
-            API_KEY: "${{ secrets.API_KEY }}",
-          };
-          EOF
+#       - name: Generate config.js from secrets
+#         run: |
+#           cat > config.js <<EOF
+#           window.APP_CONFIG = {
+#             WORKER_URL: "${{ secrets.WORKER_URL }}",
+#             API_KEY: "${{ secrets.API_KEY }}",
+#           };
+#           EOF
 
-      - name: Upload Pages artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
+#       - name: Upload Pages artifact
+#         uses: actions/upload-pages-artifact@v3
+#         with:
+#           path: .
 
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
+#   deploy:
+#     needs: build
+#     runs-on: ubuntu-latest
+#     environment:
+#       name: github-pages
+#       url: ${{ steps.deployment.outputs.page_url }}
+#     steps:
+#       - name: Deploy to GitHub Pages
+#         id: deployment
+#         uses: actions/deploy-pages@v4
