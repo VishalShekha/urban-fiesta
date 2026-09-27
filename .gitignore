@@ -3,4 +3,3 @@
 # this file at deploy time from repository Secrets, so it never needs to be
 # committed. This line is just a safety net in case you create one locally
 # for testing.
-config.js
