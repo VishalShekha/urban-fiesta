@@ -63,21 +63,43 @@ async function fetchActivities() {
 async function createActivity(name, durationSeconds) {
   const data = await apiRequest("/api/activities", {
     method: "POST",
-    body: JSON.stringify({ name, durationSeconds }),
+    body: JSON.stringify({
+      name,
+      category: getFormCategory(),
+      durationSeconds,
+    }),
   });
   activities.push(data.activity);
 }
 
-async function resetActivity(id) {
-  const data = await apiRequest(`/api/activities/${encodeURIComponent(id)}/reset`, {
-    method: "POST",
+async function updateActivity(id, name, durationSeconds) {
+  const data = await apiRequest(`/api/activities/${encodeURIComponent(id)}`, {
+    method: "PUT",
+    body: JSON.stringify({
+      name,
+      category: getFormCategory(),
+      durationSeconds,
+    }),
   });
   const idx = activities.findIndex((a) => a.id === id);
   if (idx !== -1) activities[idx] = data.activity;
 }
 
+async function resetActivity(id) {
+  const data = await apiRequest(
+    `/api/activities/${encodeURIComponent(id)}/reset`,
+    {
+      method: "POST",
+    },
+  );
+  const idx = activities.findIndex((a) => a.id === id);
+  if (idx !== -1) activities[idx] = data.activity;
+}
+
 async function deleteActivity(id) {
-  await apiRequest(`/api/activities/${encodeURIComponent(id)}`, { method: "DELETE" });
+  await apiRequest(`/api/activities/${encodeURIComponent(id)}`, {
+    method: "DELETE",
+  });
   activities = activities.filter((a) => a.id !== id);
 }
 
@@ -120,7 +142,9 @@ function stateFor(ratio, remainingMs) {
 function render() {
   emptyStateEl.classList.toggle("panel-hidden", activities.length > 0);
 
-  const existingIds = new Set(Array.from(listEl.children).map((el) => el.dataset.id));
+  const existingIds = new Set(
+    Array.from(listEl.children).map((el) => el.dataset.id),
+  );
   const nextIds = new Set(activities.map((a) => a.id));
 
   // remove cards for deleted activities
@@ -135,8 +159,15 @@ function render() {
     if (!card) {
       card = cardTemplate.content.firstElementChild.cloneNode(true);
       card.dataset.id = activity.id;
-      card.querySelector(".reset-btn").addEventListener("click", () => onReset(activity.id));
-      card.querySelector(".delete-btn").addEventListener("click", () => onDelete(activity.id));
+      card
+        .querySelector(".reset-btn")
+        .addEventListener("click", () => onReset(activity.id));
+      card
+        .querySelector(".edit-btn")
+        .addEventListener("click", () => openEditActivityPanel(activity.id));
+      card
+        .querySelector(".delete-btn")
+        .addEventListener("click", () => onDelete(activity.id));
       listEl.appendChild(card);
     }
     updateCard(card, activity);
@@ -145,13 +176,23 @@ function render() {
 
 function updateCard(card, activity) {
   const remainingMs = activity.expiresAt - serverNow();
-  const ratio = Math.min(1, Math.max(0, remainingMs / (activity.durationSeconds * 1000)));
+  const ratio = Math.min(
+    1,
+    Math.max(0, remainingMs / (activity.durationSeconds * 1000)),
+  );
   const state = stateFor(ratio, remainingMs);
 
-  card.classList.remove("state-safe", "state-warn", "state-danger", "state-expired");
+  card.classList.remove(
+    "state-safe",
+    "state-warn",
+    "state-danger",
+    "state-expired",
+  );
   card.classList.add(`state-${state}`);
 
   card.querySelector(".card-name").textContent = activity.name;
+  card.querySelector(".card-category").textContent =
+    activity.category || "General";
   card.querySelector(".card-time").textContent = formatRemaining(remainingMs);
   card.querySelector(".progress-fill").style.width = `${ratio * 100}%`;
 }
@@ -202,6 +243,29 @@ async function onDelete(id) {
 }
 
 function openNewActivityPanel() {
+  newActivityForm.dataset.editingId = "";
+  document.getElementById("form-title").textContent = "New activity";
+  document.getElementById("submit-activity").textContent = "Add";
+  newActivityForm.reset();
+  newActivityPanel.classList.remove("panel-hidden");
+  newActivityPanel.setAttribute("aria-hidden", "false");
+  document.getElementById("activity-name").focus();
+}
+
+function openEditActivityPanel(id) {
+  const activity = activities.find((item) => item.id === id);
+  if (!activity) return;
+
+  newActivityForm.dataset.editingId = id;
+  document.getElementById("form-title").textContent = "Edit activity";
+  document.getElementById("submit-activity").textContent = "Save";
+  document.getElementById("activity-name").value = activity.name;
+  document.getElementById("activity-category").value =
+    activity.category || "General";
+  const unit = durationUnitFor(activity.durationSeconds);
+  document.getElementById("duration-amount").value =
+    activity.durationSeconds / unit.seconds;
+  document.getElementById("duration-unit").value = unit.name;
   newActivityPanel.classList.remove("panel-hidden");
   newActivityPanel.setAttribute("aria-hidden", "false");
   document.getElementById("activity-name").focus();
@@ -211,6 +275,27 @@ function closeNewActivityPanel() {
   newActivityPanel.classList.add("panel-hidden");
   newActivityPanel.setAttribute("aria-hidden", "true");
   newActivityForm.reset();
+  newActivityForm.dataset.editingId = "";
+}
+
+function getFormCategory() {
+  return document.getElementById("activity-category").value.trim() || "General";
+}
+
+function durationUnitFor(durationSeconds) {
+  const units = [
+    { name: "years", seconds: 365 * 24 * 60 * 60 },
+    { name: "months", seconds: 30 * 24 * 60 * 60 },
+    { name: "weeks", seconds: 7 * 24 * 60 * 60 },
+    { name: "days", seconds: 24 * 60 * 60 },
+    { name: "hours", seconds: 60 * 60 },
+    { name: "minutes", seconds: 60 },
+    { name: "seconds", seconds: 1 },
+  ];
+  return (
+    units.find((unit) => durationSeconds % unit.seconds === 0) ||
+    units[units.length - 1]
+  );
 }
 
 newActivityBtn.addEventListener("click", openNewActivityPanel);
@@ -220,15 +305,19 @@ newActivityForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const name = document.getElementById("activity-name").value.trim();
-  const hours = Number(document.getElementById("duration-hours").value) || 0;
-  const minutes = Number(document.getElementById("duration-minutes").value) || 0;
-  const seconds = Number(document.getElementById("duration-seconds").value) || 0;
-  const durationSeconds = hours * 3600 + minutes * 60 + seconds;
+  const amount = Number(document.getElementById("duration-amount").value) || 0;
+  const unitSeconds = Number(document.getElementById("duration-unit").value);
+  const durationSeconds = Math.floor(amount * unitSeconds);
+  const editingId = newActivityForm.dataset.editingId;
 
   if (!name || durationSeconds <= 0) return;
 
   try {
-    await createActivity(name, durationSeconds);
+    if (editingId) {
+      await updateActivity(editingId, name, durationSeconds);
+    } else {
+      await createActivity(name, durationSeconds);
+    }
     closeNewActivityPanel();
     render();
   } catch (err) {
@@ -248,7 +337,8 @@ if (!WORKER_URL) {
   // Re-sync immediately when the tab regains focus, so a change made on
   // another device shows up right away instead of waiting for the poll.
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible") syncFromServer({ silent: true });
+    if (document.visibilityState === "visible")
+      syncFromServer({ silent: true });
   });
   window.addEventListener("focus", () => syncFromServer({ silent: true }));
 }

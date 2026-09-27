@@ -20,7 +20,8 @@
   box-sizing: border-box;
 }
 
-html, body {
+html,
+body {
   height: 100%;
 }
 
@@ -74,7 +75,9 @@ body {
   border: 1px solid transparent;
   padding: 9px 16px;
   cursor: pointer;
-  transition: background-color 120ms ease, border-color 120ms ease;
+  transition:
+    background-color 120ms ease,
+    border-color 120ms ease;
 }
 
 .btn-accent {
@@ -107,7 +110,9 @@ body {
   font-size: 0.95rem;
   line-height: 1;
   cursor: pointer;
-  transition: border-color 120ms ease, color 120ms ease;
+  transition:
+    border-color 120ms ease,
+    color 120ms ease;
 }
 
 .icon-btn:hover {
@@ -128,6 +133,12 @@ body {
   border-radius: var(--radius);
   padding: 20px;
   margin-bottom: 24px;
+}
+
+.panel h2 {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  margin: 0 0 16px;
 }
 
 .panel-hidden {
@@ -156,8 +167,13 @@ body {
   flex: 1 1 200px;
 }
 
+.field-category {
+  flex: 1 1 140px;
+}
+
 .field input[type="text"],
-.duration-inputs input {
+.duration-inputs input,
+.duration-inputs select {
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: var(--radius);
@@ -180,8 +196,12 @@ body {
 }
 
 .duration-inputs input {
-  width: 52px;
+  width: 72px;
   text-align: center;
+}
+
+.duration-inputs select {
+  min-width: 142px;
 }
 
 .field-actions {
@@ -251,6 +271,17 @@ body {
   white-space: nowrap;
 }
 
+.card-heading {
+  min-width: 0;
+}
+
+.card-category {
+  display: inline-block;
+  margin-top: 5px;
+  color: var(--text-dim);
+  font-size: 0.75rem;
+}
+
 .card-controls {
   display: flex;
   gap: 6px;
@@ -282,7 +313,9 @@ body {
   width: 100%;
   background: var(--safe);
   border-radius: 3px;
-  transition: width 1s linear, background-color 300ms ease;
+  transition:
+    width 1s linear,
+    background-color 300ms ease;
 }
 
 .card.state-warn .progress-fill {
