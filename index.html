@@ -64,15 +64,17 @@
                 aria-label="Duration amount"
                 required
               />
-              <select id="duration-unit" aria-label="Duration unit">
-                <option value="1">Seconds</option>
-                <option value="60">Minutes</option>
-                <option value="3600" selected>Hours</option>
-                <option value="86400">Days</option>
-                <option value="604800">Weeks</option>
-                <option value="2592000">Months (30 days)</option>
-                <option value="31536000">Years (365 days)</option>
-              </select>
+              <span class="duration-select-wrap">
+                <select id="duration-unit" aria-label="Duration unit">
+                  <option value="1">Seconds</option>
+                  <option value="60">Minutes</option>
+                  <option value="3600" selected>Hours</option>
+                  <option value="86400">Days</option>
+                  <option value="604800">Weeks</option>
+                  <option value="2592000">Months (30 days)</option>
+                  <option value="31536000">Years (365 days)</option>
+                </select>
+              </span>
             </div>
           </div>
           <div class="field field-actions">

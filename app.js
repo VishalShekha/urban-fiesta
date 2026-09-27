@@ -265,7 +265,7 @@ function openEditActivityPanel(id) {
   const unit = durationUnitFor(activity.durationSeconds);
   document.getElementById("duration-amount").value =
     activity.durationSeconds / unit.seconds;
-  document.getElementById("duration-unit").value = unit.name;
+  document.getElementById("duration-unit").value = String(unit.seconds);
   newActivityPanel.classList.remove("panel-hidden");
   newActivityPanel.setAttribute("aria-hidden", "false");
   document.getElementById("activity-name").focus();
@@ -304,9 +304,18 @@ cancelNewActivityBtn.addEventListener("click", closeNewActivityPanel);
 newActivityForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
-  const name = document.getElementById("activity-name").value.trim();
-  const amount = Number(document.getElementById("duration-amount").value) || 0;
-  const unitSeconds = Number(document.getElementById("duration-unit").value);
+  const nameInput = document.getElementById("activity-name");
+  const amountInput = document.getElementById("duration-amount");
+  const unitInput = document.getElementById("duration-unit");
+  const categoryInput = document.getElementById("activity-category");
+  if (!nameInput || !amountInput || !unitInput || !categoryInput) {
+    setSyncStatus("Activity form is out of date. Reload the page.", true);
+    return;
+  }
+
+  const name = nameInput.value.trim();
+  const amount = Number(amountInput.value) || 0;
+  const unitSeconds = Number(unitInput.value);
   const durationSeconds = Math.floor(amount * unitSeconds);
   const editingId = newActivityForm.dataset.editingId;
 
@@ -321,7 +330,7 @@ newActivityForm.addEventListener("submit", async (e) => {
     closeNewActivityPanel();
     render();
   } catch (err) {
-    setSyncStatus(`Add failed: ${err.message}`, true);
+    setSyncStatus(`${editingId ? "Save" : "Add"} failed: ${err.message}`, true);
   }
 });
 

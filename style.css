@@ -201,7 +201,41 @@ body {
 }
 
 .duration-inputs select {
+  width: 100%;
   min-width: 142px;
+  appearance: none;
+  border-color: #3b4555;
+  background: var(--surface-2);
+  cursor: pointer;
+  padding-right: 32px;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.duration-select-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.duration-select-wrap::after {
+  content: "";
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid var(--safe);
+  border-bottom: 2px solid var(--safe);
+  transform: translateY(-65%) rotate(45deg);
+  pointer-events: none;
+}
+
+.duration-inputs select:hover,
+.duration-inputs select:focus {
+  border-color: var(--safe);
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(79, 209, 165, 0.14);
 }
 
 .field-actions {
